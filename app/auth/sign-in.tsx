@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { supabase } from '@/lib/supabase';
+import { auth } from '@/lib/auth';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -14,10 +14,7 @@ export default function SignIn() {
       setLoading(true);
       setError(null);
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error } = await auth.signIn(email, password);
 
       if (error) throw error;
 

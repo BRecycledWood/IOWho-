@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { supabase } from '@/lib/supabase';
+import { auth } from '@/lib/auth';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -15,25 +15,9 @@ export default function SignUp() {
       setLoading(true);
       setError(null);
 
-      const { error: signUpError, data: { user } } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { error } = await auth.signUp(email, password, fullName);
 
-      if (signUpError) throw signUpError;
-
-      if (user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: user.id,
-              full_name: fullName,
-            },
-          ]);
-
-        if (profileError) throw profileError;
-      }
+      if (error) throw error;
 
       router.replace('/(tabs)');
     } catch (e) {

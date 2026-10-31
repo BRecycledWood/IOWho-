@@ -1,25 +1,27 @@
-import { useEffect } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import { supabase } from '@/lib/supabase';
+import { useEffect } from 'react'
+import { Stack, useRouter, useSegments } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import { auth } from '@/lib/auth'
 
 export default function RootLayout() {
-  useFrameworkReady();
-  const segments = useSegments();
-  const router = useRouter();
+  const segments = useSegments()
+  const router = useRouter()
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      const inAuthGroup = segments[0] === 'auth';
+    const subscription = auth.onAuthStateChange((session) => {
+      const inAuthGroup = segments[0] === 'auth'
 
       if (session && inAuthGroup) {
-        router.replace('/(tabs)');
+        router.replace('/(tabs)')
       } else if (!session && !inAuthGroup) {
-        router.replace('/auth/sign-in');
+        router.replace('/auth/welcome')
       }
-    });
-  }, [segments]);
+    })
+
+    return () => {
+      subscription.dispose()
+    }
+  }, [segments])
 
   return (
     <>
@@ -30,5 +32,5 @@ export default function RootLayout() {
       </Stack>
       <StatusBar style="auto" />
     </>
-  );
+  )
 }
